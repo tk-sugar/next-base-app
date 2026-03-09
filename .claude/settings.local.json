@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version && npm --version)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-turbopack --yes 2>&1)",
+      "Bash(npx create-next-app@latest /tmp/next-base-tmp --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-turbopack --yes 2>&1)",
+      "Bash(cp -r /tmp/next-base-tmp/. /Users/tk-sugar/WorkSpace/claude/next-base-app/ 2>&1 && ls /Users/tk-sugar/WorkSpace/claude/next-base-app/)",
+      "Bash(npm install pg && npm install -D @types/pg 2>&1 | tail -5)",
+      "Bash(npm run build 2>&1)",
+      "Bash(npm install 2>&1 | tail -5 && npm run build 2>&1)",
+      "Bash(docker compose up --build 2>&1)"
+    ]
+  }
+}
