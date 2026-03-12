@@ -8,7 +8,8 @@
       "Bash(npm install pg && npm install -D @types/pg 2>&1 | tail -5)",
       "Bash(npm run build 2>&1)",
       "Bash(npm install 2>&1 | tail -5 && npm run build 2>&1)",
-      "Bash(docker compose up --build 2>&1)"
+      "Bash(docker compose up --build 2>&1)",
+      "Bash(node -e \"const t = require\\('./node_modules/prisma/dist/config/index.js'\\); console.log\\(Object.keys\\(t\\)\\)\" 2>&1 | head -5)"
     ]
   }
 }

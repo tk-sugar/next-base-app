@@ -10,9 +10,11 @@
     "db:migrate": "node --env-file=.env.local --experimental-strip-types db/migrate.ts"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.1",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "next": "16.1.6",
+    "next-auth": "^5.0.0-beta.30",
     "pg": "^8.20.0",
     "prisma": "^7.5.0",
     "react": "19.2.3",

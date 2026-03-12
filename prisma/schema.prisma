@@ -16,6 +16,7 @@ model User {
   updatedAt         DateTime           @updatedAt @map("updated_at")
 
   organizations     UserOrganization[]
+  repositories      UserRepository[]
 
   @@map("users")
 }
@@ -55,62 +56,81 @@ model Repository {
   issues       Issue[]
   commits      Commit[]
   reports      Report[]
+  users        UserRepository[]
 
   @@map("repositories")
 }
 
+model UserRepository {
+  userId     String     @map("user_id")
+  repoId     String     @map("repo_id")
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@id([userId, repoId])
+  @@map("user_repositories")
+}
+
 model PullRequest {
-  id         String    @id @default(uuid())
-  repoId     String    @map("repo_id")
-  title      String
-  body       String?
-  author     String
-  state      String    @default("open")
-  labels     String[]
-  createdAt  DateTime  @map("created_at")
-  mergedAt   DateTime? @map("merged_at")
+  id             String    @id @default(uuid())
+  repoId         String    @map("repo_id")
+  githubPrNumber Int       @map("github_pr_number")
+  title          String
+  body           String?
+  author         String
+  state          String    @default("open")
+  labels         String[]
+  createdAt      DateTime  @map("created_at")
+  mergedAt       DateTime? @map("merged_at")
 
   repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
   reviews    Review[]
 
+  @@unique([repoId, githubPrNumber])
   @@map("pull_requests")
 }
 
 model Issue {
-  id         String    @id @default(uuid())
-  repoId     String    @map("repo_id")
-  title      String
-  body       String?
-  assignee   String?
-  state      String    @default("open")
-  labels     String[]
-  createdAt  DateTime  @map("created_at")
-  closedAt   DateTime? @map("closed_at")
+  id                String    @id @default(uuid())
+  repoId            String    @map("repo_id")
+  githubIssueNumber Int       @map("github_issue_number")
+  title             String
+  body              String?
+  assignee          String?
+  state             String    @default("open")
+  labels            String[]
+  createdAt         DateTime  @map("created_at")
+  closedAt          DateTime? @map("closed_at")
 
   repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
 
+  @@unique([repoId, githubIssueNumber])
   @@map("issues")
 }
 
 model Commit {
   id         String     @id @default(uuid())
   repoId     String     @map("repo_id")
+  sha        String
   author     String
   message    String
   date       DateTime
 
   repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
 
+  @@unique([repoId, sha])
   @@map("commits")
 }
 
 model Review {
-  id            String      @id @default(uuid())
-  pullRequestId String      @map("pull_request_id")
-  reviewer      String
-  comment       String?
-  state         String
-  createdAt     DateTime    @default(now()) @map("created_at")
+  id             String      @id @default(uuid())
+  pullRequestId  String      @map("pull_request_id")
+  githubReviewId String      @unique @map("github_review_id")
+  reviewer       String
+  comment        String?
+  state          String
+  createdAt      DateTime    @default(now()) @map("created_at")
 
   pullRequest   PullRequest @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
 

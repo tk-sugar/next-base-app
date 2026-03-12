@@ -1,4 +1,4 @@
-# AI GitHub レポート SaaS 仕様書
+# GitHub AI レポート 仕様書
 
 ## 1. 概要
 
