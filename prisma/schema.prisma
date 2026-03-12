@@ -1,0 +1,130 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String             @id @default(uuid())
+  githubId          String             @unique @map("github_id")
+  name              String
+  email             String             @unique
+  githubAccessToken String?            @map("github_access_token")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  organizations     UserOrganization[]
+
+  @@map("users")
+}
+
+model Organization {
+  id           String             @id @default(uuid())
+  githubOrgId  String             @unique @map("github_org_id")
+  name         String
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  users        UserOrganization[]
+  repositories Repository[]
+
+  @@map("organizations")
+}
+
+model UserOrganization {
+  userId         String       @map("user_id")
+  organizationId String       @map("organization_id")
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, organizationId])
+  @@map("user_organizations")
+}
+
+model Repository {
+  id           String       @id @default(uuid())
+  githubRepoId String       @unique @map("github_repo_id")
+  name         String
+  orgId        String       @map("org_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  pullRequests PullRequest[]
+  issues       Issue[]
+  commits      Commit[]
+  reports      Report[]
+
+  @@map("repositories")
+}
+
+model PullRequest {
+  id         String    @id @default(uuid())
+  repoId     String    @map("repo_id")
+  title      String
+  body       String?
+  author     String
+  state      String    @default("open")
+  labels     String[]
+  createdAt  DateTime  @map("created_at")
+  mergedAt   DateTime? @map("merged_at")
+
+  repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  reviews    Review[]
+
+  @@map("pull_requests")
+}
+
+model Issue {
+  id         String    @id @default(uuid())
+  repoId     String    @map("repo_id")
+  title      String
+  body       String?
+  assignee   String?
+  state      String    @default("open")
+  labels     String[]
+  createdAt  DateTime  @map("created_at")
+  closedAt   DateTime? @map("closed_at")
+
+  repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@map("issues")
+}
+
+model Commit {
+  id         String     @id @default(uuid())
+  repoId     String     @map("repo_id")
+  author     String
+  message    String
+  date       DateTime
+
+  repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@map("commits")
+}
+
+model Review {
+  id            String      @id @default(uuid())
+  pullRequestId String      @map("pull_request_id")
+  reviewer      String
+  comment       String?
+  state         String
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  pullRequest   PullRequest @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Report {
+  id        String     @id @default(uuid())
+  repoId    String     @map("repo_id")
+  weekStart DateTime   @map("week_start") @db.Date
+  summary   String
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
