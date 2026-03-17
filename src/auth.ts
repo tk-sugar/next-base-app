@@ -14,6 +14,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           scope: "read:user user:email repo read:org",
         },
       },
+      checks: ["state"],
     }),
   ],
   session: { strategy: "jwt" },
