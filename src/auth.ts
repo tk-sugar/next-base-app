@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  trustHost: true,
   providers: [
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID!,
@@ -27,7 +28,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           create: {
             githubId,
             name: (profile.name as string) ?? (profile.login as string) ?? "",
-            email: (profile.email as string) ?? "",
+            email: (profile.email as string) || `${profile.login as string}@users.noreply.github.com`,
             githubAccessToken: account.access_token,
           },
           update: {
