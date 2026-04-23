@@ -6,18 +6,15 @@ export default async function ReposPage() {
   const session = await auth();
   const userId = session!.user.id;
 
-  const [userOrgs, userRepos] = await Promise.all([
-    prisma.userOrganization.findMany({
-      where: { userId },
-      include: {
-        organization: {
-          include: { repositories: { orderBy: { name: "asc" } } },
-        },
+  const userOrgs = await prisma.userOrganization.findMany({
+    where: { userId },
+    include: {
+      organization: {
+        include: { repositories: { orderBy: { name: "asc" } } },
       },
-      orderBy: { organization: { name: "asc" } },
-    }),
-    prisma.userRepository.findMany({ where: { userId } }),
-  ]);
+    },
+    orderBy: { organization: { name: "asc" } },
+  });
 
   const orgs = userOrgs.map(({ organization }) => ({
     id: organization.id,
@@ -25,15 +22,13 @@ export default async function ReposPage() {
     repositories: organization.repositories.map((r) => ({ id: r.id, name: r.name })),
   }));
 
-  const selectedRepoIds = new Set(userRepos.map((ur) => ur.repoId));
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">リポジトリ選択</h2>
           <p className="mt-1 text-sm text-gray-500">
-            レポートを生成するリポジトリを選択してください
+            リポジトリを選択してレポートを表示
           </p>
         </div>
         <div className="flex gap-2">
@@ -49,7 +44,7 @@ export default async function ReposPage() {
           </p>
         </div>
       ) : (
-        <RepoSelector orgs={orgs} selectedRepoIds={selectedRepoIds} />
+        <RepoSelector orgs={orgs} />
       )}
     </div>
   );
